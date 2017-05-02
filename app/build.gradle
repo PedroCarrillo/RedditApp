@@ -31,10 +31,14 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
     testCompile 'junit:junit:4.12'
 
+    //Retrofit
     compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-moshi:2.2.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
 
+    //RxJava
+    compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
 
 

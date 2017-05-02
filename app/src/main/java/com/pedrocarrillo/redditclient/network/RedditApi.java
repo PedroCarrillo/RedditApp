@@ -1,11 +1,11 @@
 package com.pedrocarrillo.redditclient.network;
 
-import com.pedrocarrillo.redditclient.domain.RedditData;
 import com.pedrocarrillo.redditclient.domain.RedditResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import rx.Observable;
 
 /**
  * Created by pedrocarrillo on 4/30/17.
@@ -14,7 +14,7 @@ import retrofit2.http.Path;
 public interface RedditApi {
 
     @GET("/r/{subreddit}/.json")
-    Call<RedditResponse> getSubreddit(@Path("subreddit") String subreddit);
+    Observable<RedditResponse> getSubreddit(@Path("subreddit") String subreddit);
 
 
 }

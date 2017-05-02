@@ -3,6 +3,7 @@ package com.pedrocarrillo.redditclient.network;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /**
@@ -30,6 +31,7 @@ public class RetrofitManager {
         Retrofit.Builder builder = new Retrofit.Builder()
                 .client(client)
                 .baseUrl(BASE_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(MoshiConverterFactory.create());
 
         retrofit = builder.build();
