@@ -20,6 +20,7 @@ import com.pedrocarrillo.redditclient.network.RedditClientRetrofitCallback;
 import com.pedrocarrillo.redditclient.network.RedditClientSubscriber;
 import com.pedrocarrillo.redditclient.network.RetrofitManager;
 import com.pedrocarrillo.redditclient.ui.custom.HorizontalDividerDecoration;
+import com.pedrocarrillo.redditclient.ui.custom.LoadMoreRecyclerViewListener;
 
 
 import java.util.ArrayList;
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Subscription subscription;
 
+    private List<DisplayableItem> mainList;
+    private String after;
     private Random random = new Random();
 
     @Override
@@ -62,11 +65,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         rvMain = (RecyclerView) findViewById(R.id.rv_main);
-        List<DisplayableItem> mainList = new ArrayList<>();
+        mainList = new ArrayList<>();
         mainAdapter = new MainAdapter(mainList);
+
         rvMain.addItemDecoration(new HorizontalDividerDecoration(this));
         rvMain.setAdapter(mainAdapter);
-        rvMain.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvMain.setLayoutManager(linearLayoutManager);
+
+        rvMain.addOnScrollListener(new LoadMoreRecyclerViewListener(linearLayoutManager, new LoadMoreRecyclerViewListener.LoadMoreListener() {
+            @Override
+            public void load() {
+                addNewItems(after);
+            }
+        }));
 
 //        subscription = RetrofitManager.getInstance().getRedditApi().getSubreddit("popular")
 //                .subscribeOn(Schedulers.io())
@@ -76,24 +88,30 @@ public class MainActivity extends AppCompatActivity {
 //                    mainList.add(response);
 //                    mainAdapter.notifyDataSetChanged();
 //                });
+        addNewItems(null);
+    }
 
-        subscription = RetrofitManager.getInstance().getRedditApi().getSubreddit("popular")
-        .subscribeOn(Schedulers.io())
-        .flatMap(response -> Observable.from(response.getData().getPosts()))
-        .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
-        .map(redditPostMetadata -> {
-            int r = random.nextInt(10);
-            if (r % 5 == 0) {
-               return new RedditBigPostMetadata(redditPostMetadata);
-            } else {
-                return redditPostMetadata;
-            }
-        })
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(response -> {
-            mainList.add(response);
-            mainAdapter.notifyDataSetChanged();
-        });
-
+    public void addNewItems(String after) {
+        subscription = RetrofitManager.getInstance().getRedditApi().getSubreddit("popular", after)
+                .subscribeOn(Schedulers.io())
+                .map(redditResponse -> redditResponse.getData())
+                .flatMap(redditData -> {
+                    MainActivity.this.after = redditData.getAfter();
+                    return Observable.from(redditData.getPosts());
+                })
+                .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
+                .map(redditPostMetadata -> {
+                    int r = random.nextInt(10);
+                    if (r % 5 == 0) {
+                        return new RedditBigPostMetadata(redditPostMetadata);
+                    } else {
+                        return redditPostMetadata;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response -> {
+                    mainList.add(response);
+                    mainAdapter.notifyDataSetChanged();
+                });
     }
 }

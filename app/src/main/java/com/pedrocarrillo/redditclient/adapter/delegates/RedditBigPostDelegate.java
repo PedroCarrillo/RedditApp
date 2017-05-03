@@ -55,9 +55,11 @@ public class RedditBigPostDelegate extends AdapterDelegate<List<DisplayableItem>
         redditPostViewHolder.tvAuthor.setText(redditPost.getAuthor());
         redditPostViewHolder.tvCommentsCount.setText(String.valueOf(redditPost.getNumComments()));
         redditPostViewHolder.tvScore.setText(String.valueOf(redditPost.getScore()));
-        List<RedditImage> redditImages = redditPost.getPreview().getImages();
-        if (!redditImages.isEmpty()) {
-            Glide.with(redditPostViewHolder.ivBigImage.getContext()).load(redditPost.getPreview().getImages().get(0).getSource().getUrl()).centerCrop().into(redditPostViewHolder.ivBigImage);
+        if (redditPost.getPreview() != null && redditPost.getPreview().getImages() != null) {
+            List<RedditImage> redditImages = redditPost.getPreview().getImages();
+            if (!redditImages.isEmpty()) {
+                Glide.with(redditPostViewHolder.ivBigImage.getContext()).load(redditPost.getPreview().getImages().get(0).getSource().getUrl()).centerCrop().into(redditPostViewHolder.ivBigImage);
+            }
         }
         Date date = new Date(redditPost.getCreatedAt() * 1000L);
         redditPostViewHolder.tvTime.setReferenceTime(date.getTime());

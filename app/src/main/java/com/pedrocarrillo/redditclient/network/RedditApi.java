@@ -5,6 +5,7 @@ import com.pedrocarrillo.redditclient.domain.RedditResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -14,7 +15,6 @@ import rx.Observable;
 public interface RedditApi {
 
     @GET("/r/{subreddit}/.json")
-    Observable<RedditResponse> getSubreddit(@Path("subreddit") String subreddit);
-
+    Observable<RedditResponse> getSubreddit(@Path("subreddit") String subreddit, @Query("after") String after);
 
 }
