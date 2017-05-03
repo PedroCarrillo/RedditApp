@@ -7,4 +7,5 @@
     <dimen name="text_size_12">12sp</dimen>
     <dimen name="dimen_3dp">3dp</dimen>
     <dimen name="icon_size">15dp</dimen>
+    <dimen name="big_image_size">200dp</dimen>
 </resources>

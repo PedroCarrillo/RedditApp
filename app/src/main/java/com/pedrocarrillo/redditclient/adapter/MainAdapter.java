@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import com.pedrocarrillo.redditclient.adapter.base.AdapterDelegateManager;
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
+import com.pedrocarrillo.redditclient.adapter.delegates.RedditBigPostDelegate;
 import com.pedrocarrillo.redditclient.adapter.delegates.RedditPostAdapterDelegate;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 public class MainAdapter extends RecyclerView.Adapter {
 
     private final int TYPE_REDDIT_POST = 1;
+    private final int TYPE_BIG_REDDIT_POST = 2;
 
     private List<DisplayableItem> items;
 
@@ -24,6 +26,7 @@ public class MainAdapter extends RecyclerView.Adapter {
     public MainAdapter(List<DisplayableItem> items) {
         this.items = items;
         adapterDelegateManager = new AdapterDelegateManager<>();
+        adapterDelegateManager.addDelegate(new RedditBigPostDelegate(TYPE_BIG_REDDIT_POST));
         adapterDelegateManager.addDelegate(new RedditPostAdapterDelegate(TYPE_REDDIT_POST));
     }
 

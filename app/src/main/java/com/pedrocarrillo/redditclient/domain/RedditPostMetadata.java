@@ -9,9 +9,9 @@ import com.squareup.moshi.Json;
 
 public class RedditPostMetadata implements DisplayableItem {
 
-    private String kind;
+    protected String kind;
     @Json(name = "data")
-    private RedditPost postData;
+    protected RedditPost postData;
 
     public String getKind() {
         return kind;

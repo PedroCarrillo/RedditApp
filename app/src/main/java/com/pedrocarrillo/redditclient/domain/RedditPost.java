@@ -23,6 +23,7 @@ public class RedditPost {
     @Json(name="num_comments")
     private int numComments;
     private String author;
+    private Preview preview;
 
     public String getSubreddit() {
         return subreddit;
@@ -63,4 +64,9 @@ public class RedditPost {
     public String getAuthor() {
         return author;
     }
+
+    public Preview getPreview() {
+        return preview;
+    }
+
 }

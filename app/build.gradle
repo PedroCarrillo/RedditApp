@@ -34,6 +34,12 @@ dependencies {
     })
     compile "com.android.support:design:$supportLibrariesVersion"
     compile "com.android.support:appcompat-v7:$supportLibrariesVersion"
+
+    //Debugging
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+
     testCompile 'junit:junit:4.12'
     // Because I'm lazy and no time
     compile 'com.github.curioustechizen.android-ago:library:1.3.4'

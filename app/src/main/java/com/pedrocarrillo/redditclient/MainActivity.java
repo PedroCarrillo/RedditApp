@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.pedrocarrillo.redditclient.adapter.MainAdapter;
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
+import com.pedrocarrillo.redditclient.domain.RedditBigPostMetadata;
 import com.pedrocarrillo.redditclient.domain.RedditData;
 import com.pedrocarrillo.redditclient.domain.RedditPost;
 import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
@@ -23,6 +24,7 @@ import com.pedrocarrillo.redditclient.ui.custom.HorizontalDividerDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Subscription subscription;
 
+    private Random random = new Random();
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -64,80 +68,32 @@ public class MainActivity extends AppCompatActivity {
         rvMain.setAdapter(mainAdapter);
         rvMain.setLayoutManager(new LinearLayoutManager(this));
 
-        subscription = RetrofitManager.getInstance().getRedditApi().getSubreddit("popular")
-                .subscribeOn(Schedulers.io())
-                .flatMap(response -> Observable.from(response.getData().getPosts()))
-//                .toList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                    mainList.add(response);
-                    mainAdapter.notifyDataSetChanged();
-                });
-//                .flatMap(redditPostMetadata -> RetrofitManager.getInstance().getRedditApi().getSubreddit(redditPostMetadata.getPostData().getSubreddit()))
-//                .subscribe((RedditResponse r) -> Log.d("res" , r.getKind()), e -> Log.e("excp", e.getLocalizedMessage()));
-
-
-//        Subscription subscription = RetrofitManager.getInstance().getRedditApi().getSubreddit("popular")
+//        subscription = RetrofitManager.getInstance().getRedditApi().getSubreddit("popular")
 //                .subscribeOn(Schedulers.io())
-//                .flatMapIterable(list -> list.getData().getPosts())
-//                .doOnNext(redditPostMetadata -> {
-//                    Log.d("TESTING", ":) "+ redditPostMetadata.getPostData().getTitle());
-//                    Subscription subscription1 = RetrofitManager.getInstance().getRedditApi().getSubreddit(redditPostMetadata.getPostData().getSubreddit())
-//                            .subscribe();
-//                }).subscribe(new Subscriber<RedditPostMetadata>() {
-//                    @Override
-//                    public void onCompleted() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onNext(RedditPostMetadata redditPostMetadata) {
-//                        Log.e("asd", redditPostMetadata.getPostData().getTitle());
-//                    }
+//                .flatMap(response -> Observable.from(response.getData().getPosts()))
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(response -> {
+//                    mainList.add(response);
+//                    mainAdapter.notifyDataSetChanged();
 //                });
 
-//                .subscribe(new RedditClientSubscriber<RedditResponse>(new Subscriber<RedditResponse>() {
-//                    @Override
-//                    public void onCompleted() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e("a", e.getLocalizedMessage());
-//                    }
-//
-//                    @Override
-//                    public void onNext(RedditResponse redditResponse) {
-//                        for (RedditPostMetadata postMetadata : redditResponse.getData().getPosts()) {
-//                            Log.e("test", postMetadata.getPostData().getTitle());
-//                        }
-//                    }
-//                }));
-
-
-
-
-
-//                Call < RedditResponse > call = RetrofitManager.getInstance().getRedditApi().getSubreddit("nintendoswitch");
-//        call.enqueue(new RedditClientRetrofitCallback<RedditResponse>(new RedditClientCallback<RedditResponse>() {
-//            @Override
-//            public void onSuccess(RedditResponse redditResponse) {
-//                for (RedditPostMetadata postMetadata : redditResponse.getData().getPosts()) {
-//                    Log.e("test", postMetadata.getPostData().getTitle());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(String error) {
-//
-//            }
-//        }));
+        subscription = RetrofitManager.getInstance().getRedditApi().getSubreddit("popular")
+        .subscribeOn(Schedulers.io())
+        .flatMap(response -> Observable.from(response.getData().getPosts()))
+        .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
+        .map(redditPostMetadata -> {
+            int r = random.nextInt(10);
+            if (r % 5 == 0) {
+               return new RedditBigPostMetadata(redditPostMetadata);
+            } else {
+                return redditPostMetadata;
+            }
+        })
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(response -> {
+            mainList.add(response);
+            mainAdapter.notifyDataSetChanged();
+        });
 
     }
 }

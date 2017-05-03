@@ -12,7 +12,7 @@ import java.util.List;
 
 public class AdapterDelegateManager<T> {
 
-    SparseArray<AdapterDelegate<T>> adapterDelegateList;
+    private SparseArray<AdapterDelegate<T>> adapterDelegateList;
 
     public AdapterDelegateManager() {
         adapterDelegateList = new SparseArray<>();
