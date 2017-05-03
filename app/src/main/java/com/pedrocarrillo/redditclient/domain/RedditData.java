@@ -10,11 +10,11 @@ import java.util.List;
 
 public class RedditData {
 
-    String modhash;
+    private String modhash;
     @Json(name = "children")
-    List<RedditPostMetadata> posts;
-    String after;
-    String before;
+    private List<RedditPostMetadata> posts;
+    private String after;
+    private String before;
 
     public String getModhash() {
         return modhash;

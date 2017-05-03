@@ -6,8 +6,8 @@ package com.pedrocarrillo.redditclient.domain;
 
 public class RedditResponse {
 
-    String kind;
-    RedditData data;
+    private String kind;
+    private RedditData data;
 
     public String getKind() {
         return kind;

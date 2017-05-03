@@ -1,16 +1,17 @@
 package com.pedrocarrillo.redditclient.domain;
 
+import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
 import com.squareup.moshi.Json;
 
 /**
  * Created by pedrocarrillo on 4/30/17.
  */
 
-public class RedditPostMetadata {
+public class RedditPostMetadata implements DisplayableItem {
 
-    String kind;
+    private String kind;
     @Json(name = "data")
-    RedditPost postData;
+    private RedditPost postData;
 
     public String getKind() {
         return kind;
