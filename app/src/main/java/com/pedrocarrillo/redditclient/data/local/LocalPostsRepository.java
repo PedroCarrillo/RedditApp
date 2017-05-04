@@ -94,7 +94,8 @@ public class LocalPostsRepository implements PostsDataSource {
                             redditData.setPosts(redditPostMetadataList);
                             return redditData;
                         }
-                    });
+                    })
+                    .first();
         } else {
             return Observable.empty();
         }
