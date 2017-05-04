@@ -15,6 +15,11 @@ public interface HomeContractor {
     interface View extends BaseView<HomeContractor.Presenter> {
 
         void addedItem();
+
+        void modifiedItem(int position);
+
+        void enableScrollListener();
+
         void initView(List<DisplayableItem> displayableItems);
     }
 
@@ -22,6 +27,9 @@ public interface HomeContractor {
 
         void loadMore();
 
+        void onPostClicked(int position);
+
+        void onFavoriteClicked(int position);
     }
 
 }

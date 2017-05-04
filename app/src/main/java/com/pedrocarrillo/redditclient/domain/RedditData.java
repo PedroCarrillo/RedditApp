@@ -31,4 +31,20 @@ public class RedditData {
     public String getBefore() {
         return before;
     }
+
+    public void setModhash(String modhash) {
+        this.modhash = modhash;
+    }
+
+    public void setPosts(List<RedditPostMetadata> posts) {
+        this.posts = posts;
+    }
+
+    public void setAfter(String after) {
+        this.after = after;
+    }
+
+    public void setBefore(String before) {
+        this.before = before;
+    }
 }

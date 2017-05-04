@@ -23,11 +23,11 @@ public class HomeAdapter extends RecyclerView.Adapter {
 
     private AdapterDelegateManager<List<DisplayableItem>> adapterDelegateManager;
 
-    public HomeAdapter(List<DisplayableItem> items) {
+    public HomeAdapter(List<DisplayableItem> items, OnPostClickListener onPostClickListener) {
         this.items = items;
         adapterDelegateManager = new AdapterDelegateManager<>();
-        adapterDelegateManager.addDelegate(new RedditBigPostDelegate(TYPE_BIG_REDDIT_POST));
-        adapterDelegateManager.addDelegate(new RedditPostAdapterDelegate(TYPE_REDDIT_POST));
+        adapterDelegateManager.addDelegate(new RedditBigPostDelegate(TYPE_BIG_REDDIT_POST, onPostClickListener));
+        adapterDelegateManager.addDelegate(new RedditPostAdapterDelegate(TYPE_REDDIT_POST, onPostClickListener));
     }
 
     @Override
@@ -48,6 +48,13 @@ public class HomeAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    public interface OnPostClickListener {
+
+        void onFavoriteClicked(int position);
+        void onPostClicked(int position);
+
     }
 
 }

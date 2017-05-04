@@ -13,12 +13,35 @@ public class RedditPostMetadata implements DisplayableItem {
     @Json(name = "data")
     protected RedditPost postData;
 
+    protected boolean isFavorite;
+    protected boolean isBigPost;
+
     public String getKind() {
         return kind;
     }
 
+    public RedditPostMetadata(RedditPost postData) {
+        this.postData = postData;
+    }
+
     public RedditPost getPostData() {
         return postData;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    public boolean isBigPost() {
+        return isBigPost;
+    }
+
+    public void setBigPost(boolean bigPost) {
+        isBigPost = bigPost;
     }
 
 }

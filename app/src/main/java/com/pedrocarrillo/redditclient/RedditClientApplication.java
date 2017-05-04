@@ -18,7 +18,6 @@ public class RedditClientApplication extends Application {
             return;
         }
         LeakCanary.install(this);
-        // Normal app init code...
     }
 
 }

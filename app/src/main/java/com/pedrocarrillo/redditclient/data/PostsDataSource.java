@@ -1,6 +1,7 @@
 package com.pedrocarrillo.redditclient.data;
 
 import com.pedrocarrillo.redditclient.domain.RedditData;
+import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
 
 import rx.Observable;
 
@@ -11,5 +12,7 @@ import rx.Observable;
 public interface PostsDataSource {
 
     Observable<RedditData> getPosts(String after);
+
+    void setFavorite(RedditPostMetadata redditPostMetadata, boolean favorite);
 
 }

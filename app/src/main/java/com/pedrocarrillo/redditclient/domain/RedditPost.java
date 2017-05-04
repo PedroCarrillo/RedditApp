@@ -2,12 +2,14 @@ package com.pedrocarrillo.redditclient.domain;
 
 import com.squareup.moshi.Json;
 
+
 /**
  * Created by pedrocarrillo on 4/30/17.
  */
 
 public class RedditPost {
 
+    private String id;
     private String subreddit;
     private String title;
     @Json(name="subreddit_name_prefixed")
@@ -24,6 +26,16 @@ public class RedditPost {
     private int numComments;
     private String author;
     private Preview preview;
+
+    public RedditPost(String id, String title, String subredditNamePrefixed, boolean isNsfw, long createdAt, String thumbnail, String author) {
+        this.id = id;
+        this.title = title;
+        this.subredditNamePrefixed = subredditNamePrefixed;
+        this.isNsfw = isNsfw;
+        this.createdAt = createdAt;
+        this.thumbnail = thumbnail;
+        this.author = author;
+    }
 
     public String getSubreddit() {
         return subreddit;
@@ -67,6 +79,10 @@ public class RedditPost {
 
     public Preview getPreview() {
         return preview;
+    }
+
+    public String getId() {
+        return id;
     }
 
 }

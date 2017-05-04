@@ -1,5 +1,6 @@
 package com.pedrocarrillo.redditclient.adapter.delegates;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +9,9 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.pedrocarrillo.redditclient.R;
+import com.pedrocarrillo.redditclient.adapter.HomeAdapter;
 import com.pedrocarrillo.redditclient.adapter.base.AdapterDelegate;
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
-import com.pedrocarrillo.redditclient.domain.RedditBigPostMetadata;
 import com.pedrocarrillo.redditclient.domain.RedditImage;
 import com.pedrocarrillo.redditclient.domain.RedditPost;
 import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
@@ -25,9 +26,11 @@ import java.util.List;
 public class RedditBigPostDelegate extends AdapterDelegate<List<DisplayableItem>> {
 
     private int viewType;
+    private HomeAdapter.OnPostClickListener onPostClickListener;
 
-    public RedditBigPostDelegate(int viewType) {
+    public RedditBigPostDelegate(int viewType, HomeAdapter.OnPostClickListener onPostClickListener) {
         this.viewType = viewType;
+        this.onPostClickListener = onPostClickListener;
     }
 
     @Override
@@ -37,17 +40,17 @@ public class RedditBigPostDelegate extends AdapterDelegate<List<DisplayableItem>
 
     @Override
     protected boolean isForViewType(List<DisplayableItem> items, int position) {
-        return items.get(position) instanceof RedditBigPostMetadata;
+        return items.get(position) instanceof RedditPostMetadata && ((RedditPostMetadata)items.get(position)).isBigPost();
     }
 
     @Override
     protected RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        return new RedditBigPostViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.main_post_with_big_image_row, parent, false));
+        return new RedditBigPostViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.main_post_with_big_image_row, parent, false), onPostClickListener);
     }
 
     @Override
     protected void onBindViewHolder(List<DisplayableItem> items, RecyclerView.ViewHolder holder, int position) {
-        RedditBigPostMetadata redditPostMetadata = (RedditBigPostMetadata) items.get(position);
+        RedditPostMetadata redditPostMetadata = (RedditPostMetadata) items.get(position);
         RedditBigPostDelegate.RedditBigPostViewHolder redditPostViewHolder = (RedditBigPostDelegate.RedditBigPostViewHolder) holder;
         RedditPost redditPost = redditPostMetadata.getPostData();
         redditPostViewHolder.tvTitle.setText(redditPost.getTitle());
@@ -63,14 +66,19 @@ public class RedditBigPostDelegate extends AdapterDelegate<List<DisplayableItem>
         }
         Date date = new Date(redditPost.getCreatedAt() * 1000L);
         redditPostViewHolder.tvTime.setReferenceTime(date.getTime());
+        if(redditPostMetadata.isFavorite()) {
+            redditPostViewHolder.ivFavorite.setBackground(ContextCompat.getDrawable(redditPostViewHolder.tvTitle.getContext(), R.drawable.ic_favorite_black_24dp));
+        } else {
+            redditPostViewHolder.ivFavorite.setBackground(ContextCompat.getDrawable(redditPostViewHolder.tvTitle.getContext(), R.drawable.ic_favorite_border_black_24dp));
+        }
     }
 
     static class RedditBigPostViewHolder extends RedditPostAdapterDelegate.RedditPostViewHolder {
 
         public ImageView ivBigImage;
 
-        public RedditBigPostViewHolder(View view) {
-            super(view);
+        public RedditBigPostViewHolder(View view, HomeAdapter.OnPostClickListener onPostClickListener) {
+            super(view, onPostClickListener);
             ivBigImage = (ImageView) view.findViewById(R.id.iv_big_image);
         }
 
