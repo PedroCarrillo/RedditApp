@@ -7,6 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import com.pedrocarrillo.redditclient.R;
 import com.pedrocarrillo.redditclient.adapter.HomeAdapter;
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
+import com.pedrocarrillo.redditclient.data.PostsDataSource;
+import com.pedrocarrillo.redditclient.data.remote.RemotePostsRepository;
+import com.pedrocarrillo.redditclient.data.repositories.PostsRepository;
+import com.pedrocarrillo.redditclient.network.RetrofitManager;
 import com.pedrocarrillo.redditclient.ui.custom.BaseActivityWithPresenter;
 import com.pedrocarrillo.redditclient.ui.custom.HorizontalDividerDecoration;
 import com.pedrocarrillo.redditclient.ui.custom.LoadMoreRecyclerViewListener;
@@ -23,7 +27,8 @@ public class HomeActivity extends BaseActivityWithPresenter<HomeContractor.Prese
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupViews();
-        setPresenter(new HomePresenter(this));
+        PostsDataSource postsDataSource = PostsRepository.getInstance(RemotePostsRepository.getInstance(RetrofitManager.getInstance().getRedditApi()));
+        setPresenter(new HomePresenter(this, postsDataSource));
         presenter.start();
     }
 

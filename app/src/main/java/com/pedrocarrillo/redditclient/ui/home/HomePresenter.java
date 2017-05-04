@@ -1,6 +1,7 @@
 package com.pedrocarrillo.redditclient.ui.home;
 
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
+import com.pedrocarrillo.redditclient.data.PostsDataSource;
 import com.pedrocarrillo.redditclient.domain.RedditBigPostMetadata;
 import com.pedrocarrillo.redditclient.domain.RedditResponse;
 import com.pedrocarrillo.redditclient.network.RetrofitManager;
@@ -21,15 +22,17 @@ import rx.schedulers.Schedulers;
 public class HomePresenter implements HomeContractor.Presenter {
 
     private HomeContractor.View view;
+    private PostsDataSource postsRepository;
     private Subscription subscription;
 
     private List<DisplayableItem> displayableItemList;
     private String after;
     private Random random = new Random();
 
-    public HomePresenter(HomeContractor.View view) {
+    public HomePresenter(HomeContractor.View view, PostsDataSource postsRepository) {
         this.view = view;
         displayableItemList = new ArrayList<>();
+        this.postsRepository = postsRepository;
     }
 
     @Override
@@ -44,16 +47,16 @@ public class HomePresenter implements HomeContractor.Presenter {
     }
 
     @Override
-    public void destroy() {
+    public void unsubscribe() {
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
     }
 
     private void getRedditPosts(String after) {
-        subscription = RetrofitManager.getInstance().getRedditApi().getSubreddit("popular", after)
+        subscription =
+                postsRepository.getPosts(after)
                 .subscribeOn(Schedulers.io())
-                .map(RedditResponse::getData)
                 .flatMap(redditData -> {
                     HomePresenter.this.after = redditData.getAfter();
                     return Observable.from(redditData.getPosts());

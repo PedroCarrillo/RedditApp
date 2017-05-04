@@ -7,6 +7,6 @@ package com.pedrocarrillo.redditclient.ui.custom;
 public interface BasePresenter {
 
     void start();
-    void destroy();
+    void unsubscribe();
 
 }

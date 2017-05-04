@@ -1,11 +1,5 @@
 package com.pedrocarrillo.redditclient.ui.custom;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
-import android.view.View;
 import android.widget.Toast;
 
 /**
@@ -30,7 +24,7 @@ public class BaseActivityWithPresenter<T extends BasePresenter> extends BaseActi
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenter.destroy();
+        presenter.unsubscribe();
     }
 
 }
