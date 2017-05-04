@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RedditClient</string>
+    <string name="separator_text">-</string>
 </resources>
