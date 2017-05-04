@@ -14,7 +14,7 @@ import java.util.List;
  * Created by pedrocarrillo on 5/2/17.
  */
 
-public class MainAdapter extends RecyclerView.Adapter {
+public class HomeAdapter extends RecyclerView.Adapter {
 
     private final int TYPE_REDDIT_POST = 1;
     private final int TYPE_BIG_REDDIT_POST = 2;
@@ -23,7 +23,7 @@ public class MainAdapter extends RecyclerView.Adapter {
 
     private AdapterDelegateManager<List<DisplayableItem>> adapterDelegateManager;
 
-    public MainAdapter(List<DisplayableItem> items) {
+    public HomeAdapter(List<DisplayableItem> items) {
         this.items = items;
         adapterDelegateManager = new AdapterDelegateManager<>();
         adapterDelegateManager.addDelegate(new RedditBigPostDelegate(TYPE_BIG_REDDIT_POST));
