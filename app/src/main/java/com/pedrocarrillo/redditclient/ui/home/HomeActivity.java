@@ -15,6 +15,9 @@ import com.pedrocarrillo.redditclient.data.PostsDataSource;
 import com.pedrocarrillo.redditclient.data.local.LocalPostsRepository;
 import com.pedrocarrillo.redditclient.data.remote.RemotePostsRepository;
 import com.pedrocarrillo.redditclient.data.repositories.PostsRepository;
+import com.pedrocarrillo.redditclient.data.store.PostsStoreDataSource;
+import com.pedrocarrillo.redditclient.data.store.PostsStoreManager;
+import com.pedrocarrillo.redditclient.data.store.RemotePostsStore;
 import com.pedrocarrillo.redditclient.network.RetrofitManager;
 import com.pedrocarrillo.redditclient.ui.custom.BaseActivityWithPresenter;
 import com.pedrocarrillo.redditclient.ui.custom.HorizontalDividerDecoration;
@@ -40,10 +43,9 @@ public class HomeActivity extends BaseActivityWithPresenter<HomeContractor.Prese
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
-        LocalPostsRepository localPostsRepository = LocalPostsRepository.getInstance(this, Schedulers.io());
-        RemotePostsRepository remotePostsRepository = RemotePostsRepository.getInstance(RetrofitManager.getInstance().getRedditApi());
-        PostsDataSource postsDataSource = PostsRepository.getInstance(remotePostsRepository, localPostsRepository, isConnected);
-        setPresenter(new HomePresenter(this, postsDataSource, isConnected));
+        PostsStoreDataSource remoteStore = new RemotePostsStore(RetrofitManager.getInstance().getRedditApi());
+        PostsStoreDataSource postStoreManager = new PostsStoreManager(remoteStore);
+        setPresenter(new HomePresenter(this, postStoreManager, isConnected));
         presenter.start();
     }
 
