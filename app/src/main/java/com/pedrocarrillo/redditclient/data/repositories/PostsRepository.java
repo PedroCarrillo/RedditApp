@@ -34,11 +34,20 @@ public class PostsRepository implements PostsDataSource {
     }
 
     @Override
-    public Observable<RedditData> getPosts(String after) {
+    public Observable<RedditPostMetadata> getPaginatedPosts() {
         if (internetAccess) {
-            return mPostsRemoteDataSource.getPosts(after);
+            return mPostsRemoteDataSource.getPaginatedPosts();
         } else {
-            return mPostsLocalDataSource.getPosts(after);
+            return mPostsLocalDataSource.getPaginatedPosts();
+        }
+    }
+
+    @Override
+    public Observable<RedditPostMetadata> getPosts() {
+        if (internetAccess) {
+            return mPostsRemoteDataSource.getPosts();
+        } else {
+            return mPostsLocalDataSource.getPosts();
         }
     }
 

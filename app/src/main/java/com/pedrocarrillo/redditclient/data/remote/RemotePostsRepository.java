@@ -6,8 +6,13 @@ import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
 import com.pedrocarrillo.redditclient.domain.RedditResponse;
 import com.pedrocarrillo.redditclient.network.RedditApi;
 import com.pedrocarrillo.redditclient.network.RetrofitManager;
+import com.pedrocarrillo.redditclient.ui.home.HomePresenter;
+
+import java.util.List;
+import java.util.Random;
 
 import rx.Observable;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -17,6 +22,8 @@ import rx.schedulers.Schedulers;
 public class RemotePostsRepository implements PostsDataSource {
 
     private RedditApi redditApi;
+    private String after;
+    private Random random = new Random();
 
     private static RemotePostsRepository ourInstance;
 
@@ -32,16 +39,39 @@ public class RemotePostsRepository implements PostsDataSource {
     }
 
     @Override
-    public Observable<RedditData> getPosts(String after) {
-        return redditApi.getSubreddit("popular", after)
-                .map(RedditResponse::getData)
-                .subscribeOn(Schedulers.io());
+    public Observable<RedditPostMetadata> getPosts() {
+        return getPosts(null);
+    }
+
+    @Override
+    public Observable<RedditPostMetadata> getPaginatedPosts() {
+        return getPosts(after);
     }
 
     @Override
     public void setFavorite(RedditPostMetadata redditPostMetadata, boolean favorite) {
         // Nothing to do as this is only local.
         redditPostMetadata.setFavorite(favorite);
+    }
+
+    private Observable<RedditPostMetadata> getPosts(String after) {
+        return redditApi.getSubreddit("popular", after)
+                .map(RedditResponse::getData)
+                .subscribeOn(Schedulers.io())
+                .flatMap(redditData -> {
+                    RemotePostsRepository.this.after = redditData.getAfter();
+                    return Observable.from(redditData.getPosts());
+                })
+                .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
+                .map(redditPostMetadata -> {
+                    int r = random.nextInt(10);
+                    if (r % 5 == 0) {
+                        redditPostMetadata.setBigPost(true);
+                        return redditPostMetadata;
+                    } else {
+                        return redditPostMetadata;
+                    }
+                });
     }
 
 }
