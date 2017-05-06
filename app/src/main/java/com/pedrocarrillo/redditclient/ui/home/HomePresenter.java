@@ -41,8 +41,6 @@ public class HomePresenter implements HomeContractor.Presenter {
 
     private boolean isInternetAvailable;
     private List<DisplayableItem> displayableItemList;
-    private String after;
-    private Random random = new Random();
 
     public HomePresenter(HomeContractor.View view, PostsDataSource postsRepository, boolean isInternetAvailable) {
         this.view = view;
@@ -54,7 +52,7 @@ public class HomePresenter implements HomeContractor.Presenter {
     @Override
     public void start() {
         view.initView(displayableItemList);
-        getRedditPosts(null);
+        getRedditPosts();
         if (isInternetAvailable) {
             view.enableScrollListener();
         }
@@ -62,7 +60,7 @@ public class HomePresenter implements HomeContractor.Presenter {
 
     @Override
     public void loadMore() {
-        getRedditPosts(after);
+        getPaginatedPosts();
     }
 
     @Override
@@ -86,7 +84,6 @@ public class HomePresenter implements HomeContractor.Presenter {
         }
     }
 
-
     RedditApi redditApi = RetrofitManager.getInstance().getRedditApi();
 
     Fetcher<RedditData, RedditPostsRequest> fetcher = new Fetcher<RedditData, RedditPostsRequest>() {
@@ -101,10 +98,10 @@ public class HomePresenter implements HomeContractor.Presenter {
 
     RealStore<RedditData, RedditPostsRequest> customStore = new RedditDataStore(fetcher);
 
-    private void getRedditPosts(String after) {
+//    private void getRedditPosts(String after) {
 
 //        Store<RedditData, RedditPostsRequest> nonPersistentStore2 = new RedditDataStore();
-        RedditPostsRequest popularRequest = new RedditPostsRequest("popular", RedditData.class.getSimpleName(), after);
+//        RedditPostsRequest popularRequest = new RedditPostsRequest("popular", RedditData.class.getSimpleName(), after);
 
 //        Store<RedditData, BarCode> nonPersistentStore = StoreBuilder.<RedditData>barcode()
 //                .fetcher(barCode -> {
@@ -115,40 +112,32 @@ public class HomePresenter implements HomeContractor.Presenter {
 //                .open();
 //        BarCode popularRequest = new BarCode(RedditData.class.getSimpleName(), "popular");
 
-        subscription = customStore
-                .get(popularRequest)
-                .flatMap(redditData -> {
-                    HomePresenter.this.after = redditData.getAfter();
-                    return Observable.from(redditData.getPosts());
-                })
-                .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
-                .map(redditPostMetadata -> {
-                    int r = random.nextInt(10);
-                    if (r % 5 == 0) {
-                        redditPostMetadata.setBigPost(true);
-                        return redditPostMetadata;
-                    } else {
-                        return redditPostMetadata;
-                    }
-                })
+//        subscription = customStore
+//                .get(popularRequest)
+//                .flatMap(redditData -> {
+//                    HomePresenter.this.after = redditData.getAfter();
+//                    return Observable.from(redditData.getPosts());
+//                })
+//                .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
+//                .map(redditPostMetadata -> {
+//                    int r = random.nextInt(10);
+//                    if (r % 5 == 0) {
+//                        redditPostMetadata.setBigPost(true);
+//                        return redditPostMetadata;
+//                    } else {
+//                        return redditPostMetadata;
+//                    }
+//                })
+
+    private void getRedditPosts() {
+        subscription =
+                postsRepository.getPosts()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RedditPostMetadata>() {
-                               @Override
-                               public void onCompleted() {
-                                   if (!isInternetAvailable) unsubscribe();
-                               }
-
-                               @Override
-                               public void onError(Throwable e) {
-                                   view.showError(e.getLocalizedMessage());
-                               }
-
-                               @Override
-                               public void onNext(RedditPostMetadata redditPostMetadata) {
-                                    displayableItemList.add(redditPostMetadata);
-                                    view.addedItem();
-                               }
-                });
+                .subscribe(redditPostMetadata ->{
+                    displayableItemList.add(redditPostMetadata);
+                    view.addedItem();
+                }, e -> view.showError(e.getLocalizedMessage()));
+    }
 
 
 //        subscription =
@@ -186,5 +175,12 @@ public class HomePresenter implements HomeContractor.Presenter {
 //                               }
 //                });
 
+    private void getPaginatedPosts() {
+        subscription = postsRepository.getPaginatedPosts()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(redditPostMetadata ->{
+                    displayableItemList.add(redditPostMetadata);
+                    view.addedItem();
+                }, e -> view.showError(e.getLocalizedMessage()));
     }
 }
