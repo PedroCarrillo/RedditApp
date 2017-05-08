@@ -28,8 +28,6 @@ public class HomePresenter implements HomeContractor.Presenter {
 
     private boolean isInternetAvailable;
     private List<DisplayableItem> displayableItemList;
-    private String after;
-    private Random random = new Random();
 
     public HomePresenter(HomeContractor.View view, PostsDataSource postsRepository, boolean isInternetAvailable) {
         this.view = view;
@@ -41,7 +39,7 @@ public class HomePresenter implements HomeContractor.Presenter {
     @Override
     public void start() {
         view.initView(displayableItemList);
-        getRedditPosts(null);
+        getRedditPosts();
         if (isInternetAvailable) {
             view.enableScrollListener();
         }
@@ -49,7 +47,7 @@ public class HomePresenter implements HomeContractor.Presenter {
 
     @Override
     public void loadMore() {
-        getRedditPosts(after);
+        getPaginatedPosts();
     }
 
     @Override
@@ -73,41 +71,22 @@ public class HomePresenter implements HomeContractor.Presenter {
         }
     }
 
-    private void getRedditPosts(String after) {
+    private void getRedditPosts() {
         subscription =
-                postsRepository.getPosts(after)
-                .flatMap(redditData -> {
-                    HomePresenter.this.after = redditData.getAfter();
-                    return Observable.from(redditData.getPosts());
-                })
-                .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
-                .map(redditPostMetadata -> {
-                    int r = random.nextInt(10);
-                    if (r % 5 == 0) {
-                        redditPostMetadata.setBigPost(true);
-                        return redditPostMetadata;
-                    } else {
-                        return redditPostMetadata;
-                    }
-                })
+                postsRepository.getPosts()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RedditPostMetadata>() {
-                               @Override
-                               public void onCompleted() {
-                                   if (!isInternetAvailable) unsubscribe();
-                               }
+                .subscribe(redditPostMetadata ->{
+                    displayableItemList.add(redditPostMetadata);
+                    view.addedItem();
+                }, e -> view.showError(e.getLocalizedMessage()));
+    }
 
-                               @Override
-                               public void onError(Throwable e) {
-                                   view.showError(e.getLocalizedMessage());
-                               }
-
-                               @Override
-                               public void onNext(RedditPostMetadata redditPostMetadata) {
-                                    displayableItemList.add(redditPostMetadata);
-                                    view.addedItem();
-                               }
-                });
-
+    private void getPaginatedPosts() {
+        subscription = postsRepository.getPaginatedPosts()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(redditPostMetadata ->{
+                    displayableItemList.add(redditPostMetadata);
+                    view.addedItem();
+                }, e -> view.showError(e.getLocalizedMessage()));
     }
 }

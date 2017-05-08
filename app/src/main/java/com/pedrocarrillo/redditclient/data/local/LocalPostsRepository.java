@@ -44,8 +44,6 @@ public class LocalPostsRepository implements PostsDataSource {
             PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_FAVORITE
     };
 
-    private boolean load;
-
     public static LocalPostsRepository getInstance(@NonNull Context context,
                                                    @NonNull Scheduler scheduler) {
         if (ourInstance == null) {
@@ -60,7 +58,6 @@ public class LocalPostsRepository implements PostsDataSource {
         RedditLurkerDbHelper dbHelper = new RedditLurkerDbHelper(context);
         mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, scheduler);
         mTaskMapperFunction = this::getPost;
-        load = false;
     }
 
     private RedditPostMetadata getPost(@NonNull Cursor c){
@@ -79,26 +76,18 @@ public class LocalPostsRepository implements PostsDataSource {
     }
 
     @Override
-    public Observable<RedditData> getPosts(String after) {
-        if (!load) {
-            load = true;
-            String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?", TextUtils.join(",", projection), PostsPersistenceContract.PostEntry.TABLE_NAME, PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_FAVORITE);
-            return mDatabaseHelper.createQuery(PostsPersistenceContract.PostEntry.TABLE_NAME, sql, "1")
-                    .mapToList(mTaskMapperFunction)
-                    .subscribeOn(Schedulers.io())
-                    .map(new Func1<List<RedditPostMetadata>, RedditData>() {
+    public Observable<RedditPostMetadata> getPosts() {
+        String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?", TextUtils.join(",", projection), PostsPersistenceContract.PostEntry.TABLE_NAME, PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_FAVORITE);
+        return mDatabaseHelper.createQuery(PostsPersistenceContract.PostEntry.TABLE_NAME, sql, "1")
+                .mapToList(mTaskMapperFunction)
+                .first()
+                .subscribeOn(Schedulers.io())
+                .flatMap(Observable::from);
+    }
 
-                        @Override
-                        public RedditData call(List<RedditPostMetadata> redditPostMetadataList) {
-                            RedditData redditData = new RedditData();
-                            redditData.setPosts(redditPostMetadataList);
-                            return redditData;
-                        }
-                    })
-                    .first();
-        } else {
-            return Observable.empty();
-        }
+    @Override
+    public Observable<RedditPostMetadata> getPaginatedPosts() {
+        return Observable.empty();
     }
 
     @Override
