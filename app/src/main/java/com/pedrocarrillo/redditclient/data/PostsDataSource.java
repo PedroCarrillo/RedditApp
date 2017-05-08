@@ -11,7 +11,9 @@ import rx.Observable;
 
 public interface PostsDataSource {
 
-    Observable<RedditData> getPosts(String after);
+    Observable<RedditPostMetadata> getPosts();
+
+    Observable<RedditPostMetadata> getPaginatedPosts();
 
     void setFavorite(RedditPostMetadata redditPostMetadata, boolean favorite);
 
