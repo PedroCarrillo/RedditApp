@@ -21,6 +21,8 @@ public interface HomeContractor {
         void enableScrollListener();
 
         void initView(List<DisplayableItem> displayableItems);
+
+        void showPost(String permalink);
     }
 
     interface Presenter extends BasePresenter {

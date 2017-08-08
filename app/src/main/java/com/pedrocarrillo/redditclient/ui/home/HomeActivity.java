@@ -1,31 +1,26 @@
 package com.pedrocarrillo.redditclient.ui.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.pedrocarrillo.redditclient.R;
 import com.pedrocarrillo.redditclient.adapter.HomeAdapter;
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
-import com.pedrocarrillo.redditclient.data.PostsDataSource;
-import com.pedrocarrillo.redditclient.data.local.LocalPostsRepository;
-import com.pedrocarrillo.redditclient.data.remote.RemotePostsRepository;
-import com.pedrocarrillo.redditclient.data.repositories.PostsRepository;
-import com.pedrocarrillo.redditclient.data.store.PostsStoreDataSource;
-import com.pedrocarrillo.redditclient.data.store.PostsStoreManager;
-import com.pedrocarrillo.redditclient.data.store.RemotePostsStore;
+import com.pedrocarrillo.redditclient.data.store.list.ListPostsStoreDataSource;
+import com.pedrocarrillo.redditclient.data.store.list.ListPostsStoreManager;
+import com.pedrocarrillo.redditclient.data.store.list.ListsPostStoreList;
 import com.pedrocarrillo.redditclient.network.RetrofitManager;
 import com.pedrocarrillo.redditclient.ui.custom.BaseActivityWithPresenter;
 import com.pedrocarrillo.redditclient.ui.custom.HorizontalDividerDecoration;
 import com.pedrocarrillo.redditclient.ui.custom.LoadMoreRecyclerViewListener;
+import com.pedrocarrillo.redditclient.ui.singlePost.PostActivity;
 
 import java.util.List;
-
-import rx.schedulers.Schedulers;
 
 public class HomeActivity extends BaseActivityWithPresenter<HomeContractor.Presenter> implements HomeContractor.View, HomeAdapter.OnPostClickListener {
 
@@ -43,8 +38,8 @@ public class HomeActivity extends BaseActivityWithPresenter<HomeContractor.Prese
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
-        PostsStoreDataSource remoteStore = new RemotePostsStore(RetrofitManager.getInstance().getRedditApi());
-        PostsStoreDataSource postStoreManager = new PostsStoreManager(remoteStore);
+        ListPostsStoreDataSource remoteStore = new ListsPostStoreList(RetrofitManager.getInstance().getRedditApi());
+        ListPostsStoreDataSource postStoreManager = new ListPostsStoreManager(remoteStore);
         setPresenter(new HomePresenter(this, postStoreManager, isConnected));
         presenter.start();
     }
@@ -87,4 +82,10 @@ public class HomeActivity extends BaseActivityWithPresenter<HomeContractor.Prese
         homeAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void showPost(String permalink) {
+        Intent intent = new Intent(this, PostActivity.class);
+        intent.putExtra(PostActivity.POST_PERMALINK, permalink);
+        startActivity(intent);
+    }
 }

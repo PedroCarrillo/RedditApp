@@ -26,6 +26,7 @@ public class RedditPost {
     private int numComments;
     private String author;
     private Preview preview;
+    private String permalink;
 
     public RedditPost(String id, String title, String subredditNamePrefixed, boolean isNsfw, long createdAt, String thumbnail, String author) {
         this.id = id;
@@ -85,4 +86,7 @@ public class RedditPost {
         return id;
     }
 
+    public String getPermalink() {
+        return permalink;
+    }
 }

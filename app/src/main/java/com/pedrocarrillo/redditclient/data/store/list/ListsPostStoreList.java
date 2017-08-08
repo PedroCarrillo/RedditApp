@@ -1,8 +1,8 @@
-package com.pedrocarrillo.redditclient.data.store;
+package com.pedrocarrillo.redditclient.data.store.list;
 
 import com.nytimes.android.external.store.base.Fetcher;
 import com.nytimes.android.external.store.base.impl.RealStore;
-import com.pedrocarrillo.redditclient.data.remote.RemotePostsRepository;
+import com.pedrocarrillo.redditclient.data.store.RedditPostsRequest;
 import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
 import com.pedrocarrillo.redditclient.domain.RedditResponse;
 import com.pedrocarrillo.redditclient.network.RedditApi;
@@ -19,7 +19,7 @@ import rx.schedulers.Schedulers;
  * Created by pedrocarrillo on 5/5/17.
  */
 
-public class RemotePostsStore implements PostsStoreDataSource {
+public class ListsPostStoreList implements ListPostsStoreDataSource {
 
     private RedditApi redditApi;
     private String after;
@@ -39,7 +39,7 @@ public class RemotePostsStore implements PostsStoreDataSource {
                 .map(RedditResponse::getData)
                 .subscribeOn(Schedulers.io())
                 .flatMap(redditData -> {
-                    RemotePostsStore.this.after = redditData.getAfter();
+                    ListsPostStoreList.this.after = redditData.getAfter();
                     return Observable.from(redditData.getPosts());
                 })
                 .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
@@ -56,7 +56,7 @@ public class RemotePostsStore implements PostsStoreDataSource {
     }
 
 
-    public RemotePostsStore(RedditApi redditApi) {
+    public ListsPostStoreList(RedditApi redditApi) {
         this.redditApi = redditApi;
         this.remoteStore = new RedditPostRealStore(fetcher);
     }
@@ -71,11 +71,6 @@ public class RemotePostsStore implements PostsStoreDataSource {
     public Observable<List<RedditPostMetadata>> getPaginatedPosts(String subreddit) {
         RedditPostsRequest redditPostsRequest = new RedditPostsRequest(subreddit, RedditPostMetadata.class.getSimpleName(), after);
         return remoteStore.get(redditPostsRequest);
-    }
-
-    @Override
-    public void setFavorite(RedditPostMetadata redditPostMetadata, boolean favorite) {
-        // do nothing
     }
 
 }

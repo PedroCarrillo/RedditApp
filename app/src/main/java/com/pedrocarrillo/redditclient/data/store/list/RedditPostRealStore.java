@@ -1,7 +1,8 @@
-package com.pedrocarrillo.redditclient.data.store;
+package com.pedrocarrillo.redditclient.data.store.list;
 
 import com.nytimes.android.external.store.base.Fetcher;
 import com.nytimes.android.external.store.base.impl.RealStore;
+import com.pedrocarrillo.redditclient.data.store.RedditPostsRequest;
 import com.pedrocarrillo.redditclient.domain.RedditData;
 import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
 import com.pedrocarrillo.redditclient.domain.RedditResponse;
