@@ -72,4 +72,7 @@ dependencies {
     compile "com.nytimes.android:middleware:$storeLibraryVersion"
     compile "com.nytimes.android:filesystem:$storeLibraryVersion"
 
+    //Groupie
+    compile 'com.xwray:groupie:2.0.0-alpha2'
+
 }

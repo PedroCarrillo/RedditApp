@@ -1,26 +1,18 @@
 package com.pedrocarrillo.redditclient.data.store.post;
 
-import android.util.Log;
-
 import com.nytimes.android.external.store.base.Fetcher;
 import com.nytimes.android.external.store.base.impl.BarCode;
-import com.nytimes.android.external.store.base.impl.MemoryPolicy;
-import com.nytimes.android.external.store.base.impl.RealStore;
-import com.nytimes.android.external.store.base.impl.RealStoreBuilder;
 import com.nytimes.android.external.store.base.impl.Store;
 import com.nytimes.android.external.store.base.impl.StoreBuilder;
-import com.pedrocarrillo.redditclient.data.store.list.RedditPostRealStore;
 import com.pedrocarrillo.redditclient.domain.RedditData;
 import com.pedrocarrillo.redditclient.network.RedditApi;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
 import rx.Observable;
 
 /**
- * Created by pedrocarrillo on 8/8/17.
+ * @author pedrocarrillo
  */
 
 public class PostStore implements PostStoreDataSource {
@@ -45,7 +37,6 @@ public class PostStore implements PostStoreDataSource {
     };
 
     private Observable<RedditData> getRemotePost(String key) {
-        Log.e("redditApi", "getRemotePost");
         return redditApi.getPost(key);
     }
 
