@@ -5,6 +5,7 @@ import com.nytimes.android.external.store.base.impl.RealStore;
 import com.pedrocarrillo.redditclient.data.RedditDataParser;
 import com.pedrocarrillo.redditclient.data.store.RedditPostsRequest;
 import com.pedrocarrillo.redditclient.domain.RedditContent;
+import com.pedrocarrillo.redditclient.domain.RedditResponse;
 import com.pedrocarrillo.redditclient.network.RedditApi;
 import java.util.List;
 import java.util.Random;
@@ -35,9 +36,13 @@ public class ListsPostStoreList implements ListPostsStoreDataSource {
 
     private Observable<List<RedditContent>> getPosts(String subreddit, String after) {
         return redditApi.getSubreddit(subreddit, after)
-                .flatMap(new RedditDataParser())
+                .map(RedditResponse::getData)
                 .subscribeOn(Schedulers.io())
-                .filter(redditContent -> !redditContent.getRedditContentData().isNsfw())
+                .flatMap(redditData -> {
+                    ListsPostStoreList.this.after = redditData.getAfter();
+                    return Observable.from(redditData.getChildren());
+                })
+                .filter(redditPostMetadata -> !redditPostMetadata.getRedditContentData().isNsfw())
                 .map(redditPostMetadata -> {
                     int r = random.nextInt(10);
                     if (r % 5 == 0) {

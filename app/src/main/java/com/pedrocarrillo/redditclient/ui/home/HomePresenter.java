@@ -35,6 +35,7 @@ public class HomePresenter implements HomeContractor.Presenter {
     public void start() {
         view.initView(displayableItemList);
         getRedditPosts();
+//        getPaginatedPosts();
         if (isInternetAvailable) {
             view.enableScrollListener();
         }

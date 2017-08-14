@@ -11,16 +11,17 @@ import rx.functions.Func1
  */
 class RedditDataParser : Func1<RedditResponse, Observable<RedditContent>> {
 
-    private var after: String? = null
+    public var after: String? = null
 
     override fun call(redditResponse : RedditResponse?) : Observable<RedditContent> {
         return Observable
                 .just(redditResponse?.data)
                 .flatMap { redditData: RedditData? ->
+                    this.after = redditData?.after
                     if (redditData == null) {
                         Observable.empty()
                     } else {
-                        Observable.from(redditData?.children)
+                        Observable.from(redditData.children)
                     }
                 }
 
