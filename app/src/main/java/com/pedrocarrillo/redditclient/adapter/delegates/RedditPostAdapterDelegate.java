@@ -14,8 +14,8 @@ import com.pedrocarrillo.redditclient.R;
 import com.pedrocarrillo.redditclient.adapter.HomeAdapter;
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
 import com.pedrocarrillo.redditclient.adapter.base.AdapterDelegate;
-import com.pedrocarrillo.redditclient.domain.RedditPost;
-import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
+import com.pedrocarrillo.redditclient.domain.RedditContentData;
+import com.pedrocarrillo.redditclient.domain.RedditContent;
 
 import java.util.Date;
 import java.util.List;
@@ -41,7 +41,7 @@ public class RedditPostAdapterDelegate extends AdapterDelegate<List<DisplayableI
 
     @Override
     protected boolean isForViewType(List<DisplayableItem> items, int position) {
-        return items.get(position) instanceof RedditPostMetadata && !((RedditPostMetadata)items.get(position)).isBigPost();
+        return items.get(position) instanceof RedditContent && !((RedditContent)items.get(position)).isBigPost();
     }
 
     @Override
@@ -51,18 +51,18 @@ public class RedditPostAdapterDelegate extends AdapterDelegate<List<DisplayableI
 
     @Override
     protected void onBindViewHolder(List<DisplayableItem> items, RecyclerView.ViewHolder holder, int position) {
-        RedditPostMetadata redditPostMetadata = (RedditPostMetadata) items.get(position);
+        RedditContent redditContent = (RedditContent) items.get(position);
         RedditPostViewHolder redditPostViewHolder = (RedditPostViewHolder) holder;
-        RedditPost redditPost = redditPostMetadata.getPostData();
-        redditPostViewHolder.tvTitle.setText(redditPost.getTitle());
-        redditPostViewHolder.tvSubreddit.setText(redditPost.getSubredditNamePrefixed());
-        redditPostViewHolder.tvAuthor.setText(redditPost.getAuthor());
-        redditPostViewHolder.tvCommentsCount.setText(String.valueOf(redditPost.getNumComments()));
-        redditPostViewHolder.tvScore.setText(String.valueOf(redditPost.getScore()));
-        Glide.with(redditPostViewHolder.ivThumbnail.getContext()).load(redditPost.getThumbnail()).centerCrop().into(redditPostViewHolder.ivThumbnail);
-        Date date = new Date(redditPost.getCreatedAt() * 1000L);
+        RedditContentData redditContentData = redditContent.getRedditContentData();
+        redditPostViewHolder.tvTitle.setText(redditContentData.getTitle());
+        redditPostViewHolder.tvSubreddit.setText(redditContentData.getSubredditNamePrefixed());
+        redditPostViewHolder.tvAuthor.setText(redditContentData.getAuthor());
+        redditPostViewHolder.tvCommentsCount.setText(String.valueOf(redditContentData.getNumComments()));
+        redditPostViewHolder.tvScore.setText(String.valueOf(redditContentData.getScore()));
+        Glide.with(redditPostViewHolder.ivThumbnail.getContext()).load(redditContentData.getThumbnail()).centerCrop().into(redditPostViewHolder.ivThumbnail);
+        Date date = new Date(redditContentData.getCreatedAt() * 1000L);
         redditPostViewHolder.tvTime.setReferenceTime(date.getTime());
-        if(redditPostMetadata.isFavorite()) {
+        if(redditContent.isFavorite()) {
             redditPostViewHolder.ivFavorite.setBackground(ContextCompat.getDrawable(redditPostViewHolder.tvTitle.getContext(), R.drawable.ic_favorite_black_24dp));
         } else {
             redditPostViewHolder.ivFavorite.setBackground(ContextCompat.getDrawable(redditPostViewHolder.tvTitle.getContext(), R.drawable.ic_favorite_border_black_24dp));

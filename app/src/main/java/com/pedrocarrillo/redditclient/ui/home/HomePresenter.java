@@ -2,7 +2,7 @@ package com.pedrocarrillo.redditclient.ui.home;
 
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
 import com.pedrocarrillo.redditclient.data.store.list.ListPostsStoreDataSource;
-import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
+import com.pedrocarrillo.redditclient.domain.RedditContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,15 +48,15 @@ public class HomePresenter implements HomeContractor.Presenter {
     @Override
     public void onPostClicked(int position) {
         DisplayableItem item = displayableItemList.get(position);
-        RedditPostMetadata redditPostMetadata = (RedditPostMetadata) item;
-        view.showPost(redditPostMetadata.getPostData().getPermalink());
+        RedditContent redditContent = (RedditContent) item;
+        view.showPost(redditContent.getRedditContentData().getPermalink());
     }
 
     @Override
     public void onFavoriteClicked(int position) {
         DisplayableItem item = displayableItemList.get(position);
-        RedditPostMetadata redditPostMetadata = (RedditPostMetadata) item;
-        redditPostMetadata.setFavorite(!redditPostMetadata.isFavorite());
+        RedditContent redditContent = (RedditContent) item;
+        redditContent.setFavorite(!redditContent.isFavorite());
 //        postsRepository.setFavorite(redditPostMetadata, redditPostMetadata.isFavorite());
         view.modifiedItem(position);
     }
@@ -70,7 +70,7 @@ public class HomePresenter implements HomeContractor.Presenter {
 
     private void getRedditPosts() {
         subscription =
-                postsRepository.getPosts("popular")
+                postsRepository.getPosts("nintendoswitch")
                 .flatMap(Observable::from)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(redditPostMetadata ->{
@@ -80,7 +80,7 @@ public class HomePresenter implements HomeContractor.Presenter {
     }
 
     private void getPaginatedPosts() {
-        subscription = postsRepository.getPaginatedPosts("popular")
+        subscription = postsRepository.getPaginatedPosts("nintendoswitch")
                 .flatMap(Observable::from)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(redditPostMetadata ->{

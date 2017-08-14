@@ -5,7 +5,10 @@ import com.nytimes.android.external.store.base.impl.BarCode;
 import com.nytimes.android.external.store.base.impl.Store;
 import com.nytimes.android.external.store.base.impl.StoreBuilder;
 import com.pedrocarrillo.redditclient.domain.RedditData;
+import com.pedrocarrillo.redditclient.domain.RedditResponse;
 import com.pedrocarrillo.redditclient.network.RedditApi;
+
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -19,29 +22,29 @@ public class PostStore implements PostStoreDataSource {
 
     private RedditApi redditApi;
 
-    private Store<RedditData, BarCode> store;
+    private Store<List<RedditResponse>, BarCode> store;
 
     public PostStore(RedditApi redditApi) {
         this.redditApi = redditApi;
-        this.store = StoreBuilder.<RedditData>barcode()
+        this.store = StoreBuilder.<List<RedditResponse>>barcode()
                 .fetcher(fetcher)
                 .open();
     }
 
-    private Fetcher<RedditData, BarCode> fetcher = new Fetcher<RedditData, BarCode>() {
+    private Fetcher<List<RedditResponse>, BarCode> fetcher = new Fetcher<List<RedditResponse>, BarCode>() {
         @Nonnull
         @Override
-        public Observable<RedditData> fetch(@Nonnull BarCode barCode) {
+        public Observable<List<RedditResponse>> fetch(@Nonnull BarCode barCode) {
             return getRemotePost(barCode.getKey());
         }
     };
 
-    private Observable<RedditData> getRemotePost(String key) {
+    private Observable<List<RedditResponse>> getRemotePost(String key) {
         return redditApi.getPost(key);
     }
 
     @Override
-    public Observable<RedditData> getPost(String permalink) {
+    public Observable<List<RedditResponse>> getPost(String permalink) {
         BarCode barCode = new BarCode("Post", permalink);
         return store.get(barCode);
     }

@@ -1,9 +1,9 @@
 package com.pedrocarrillo.redditclient.network;
 
-import com.pedrocarrillo.redditclient.domain.RedditData;
 import com.pedrocarrillo.redditclient.domain.RedditResponse;
 
-import retrofit2.Call;
+import java.util.List;
+
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -19,6 +19,6 @@ public interface RedditApi {
     Observable<RedditResponse> getSubreddit(@Path("subreddit") String subreddit, @Query("after") String after);
 
     @GET("{permalink}.json")
-    Observable<RedditData> getPost(@Path(value = "permalink",encoded = true) String permalink);
+    Observable<List<RedditResponse>> getPost(@Path(value = "permalink",encoded = true) String permalink);
 
 }

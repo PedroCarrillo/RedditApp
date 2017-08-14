@@ -16,4 +16,12 @@ public class RedditResponse {
     public RedditData getData() {
         return data;
     }
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
+
+    public void setData(RedditData data) {
+        this.data = data;
+    }
 }

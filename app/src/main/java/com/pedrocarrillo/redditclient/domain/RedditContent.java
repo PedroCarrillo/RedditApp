@@ -1,17 +1,17 @@
 package com.pedrocarrillo.redditclient.domain;
 
+import com.google.gson.annotations.SerializedName;
 import com.pedrocarrillo.redditclient.adapter.base.DisplayableItem;
-import com.squareup.moshi.Json;
 
 /**
  * Created by pedrocarrillo on 4/30/17.
  */
 
-public class RedditPostMetadata implements DisplayableItem {
+public class RedditContent implements DisplayableItem {
 
     protected String kind;
-    @Json(name = "data")
-    protected RedditPost postData;
+    @SerializedName("data")
+    protected RedditContentData redditContentData;
 
     protected boolean isFavorite;
     protected boolean isBigPost;
@@ -20,12 +20,15 @@ public class RedditPostMetadata implements DisplayableItem {
         return kind;
     }
 
-    public RedditPostMetadata(RedditPost postData) {
-        this.postData = postData;
+    public RedditContent() {
     }
 
-    public RedditPost getPostData() {
-        return postData;
+    public RedditContent(RedditContentData redditContentData) {
+        this.redditContentData = redditContentData;
+    }
+
+    public RedditContentData getRedditContentData() {
+        return redditContentData;
     }
 
     public boolean isFavorite() {
@@ -44,4 +47,11 @@ public class RedditPostMetadata implements DisplayableItem {
         isBigPost = bigPost;
     }
 
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
+
+    public void setRedditContentData(RedditContentData redditContentData) {
+        this.redditContentData = redditContentData;
+    }
 }

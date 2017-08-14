@@ -4,7 +4,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.moshi.MoshiConverterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by pedrocarrillo on 4/30/17.
@@ -32,7 +32,7 @@ public class RetrofitManager {
                 .client(client)
                 .baseUrl(BASE_URL)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create());
+                .addConverterFactory(GsonConverterFactory.create(GsonManager.getInstance().getGson()));
 
         retrofit = builder.build();
     }

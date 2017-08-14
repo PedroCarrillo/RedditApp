@@ -1,7 +1,6 @@
 package com.pedrocarrillo.redditclient.data;
 
-import com.pedrocarrillo.redditclient.domain.RedditData;
-import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
+import com.pedrocarrillo.redditclient.domain.RedditContent;
 
 import rx.Observable;
 
@@ -11,10 +10,10 @@ import rx.Observable;
 
 public interface PostsDataSource {
 
-    Observable<RedditPostMetadata> getPosts();
+    Observable<RedditContent> getPosts();
 
-    Observable<RedditPostMetadata> getPaginatedPosts();
+    Observable<RedditContent> getPaginatedPosts();
 
-    void setFavorite(RedditPostMetadata redditPostMetadata, boolean favorite);
+    void setFavorite(RedditContent redditContent, boolean favorite);
 
 }

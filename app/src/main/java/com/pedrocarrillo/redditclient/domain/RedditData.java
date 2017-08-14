@@ -1,6 +1,6 @@
 package com.pedrocarrillo.redditclient.domain;
 
-import com.squareup.moshi.Json;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import java.util.List;
 public class RedditData {
 
     private String modhash;
-    @Json(name = "children")
-    private List<RedditPostMetadata> posts;
+    @SerializedName("children")
+    private List<RedditContent> children;
     private String after;
     private String before;
 
@@ -20,8 +20,8 @@ public class RedditData {
         return modhash;
     }
 
-    public List<RedditPostMetadata> getPosts() {
-        return posts;
+    public List<RedditContent> getChildren() {
+        return children;
     }
 
     public String getAfter() {
@@ -36,8 +36,8 @@ public class RedditData {
         this.modhash = modhash;
     }
 
-    public void setPosts(List<RedditPostMetadata> posts) {
-        this.posts = posts;
+    public void setChildren(List<RedditContent> children) {
+        this.children = children;
     }
 
     public void setAfter(String after) {

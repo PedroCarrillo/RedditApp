@@ -2,11 +2,10 @@ package com.pedrocarrillo.redditclient.data.store.list;
 
 import com.nytimes.android.external.store.base.Fetcher;
 import com.nytimes.android.external.store.base.impl.RealStore;
+import com.pedrocarrillo.redditclient.data.RedditDataParser;
 import com.pedrocarrillo.redditclient.data.store.RedditPostsRequest;
-import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
-import com.pedrocarrillo.redditclient.domain.RedditResponse;
+import com.pedrocarrillo.redditclient.domain.RedditContent;
 import com.pedrocarrillo.redditclient.network.RedditApi;
-
 import java.util.List;
 import java.util.Random;
 
@@ -24,25 +23,21 @@ public class ListsPostStoreList implements ListPostsStoreDataSource {
     private RedditApi redditApi;
     private String after;
     private Random random = new Random();
-    private RealStore<List<RedditPostMetadata>, RedditPostsRequest> remoteStore;
+    private RealStore<List<RedditContent>, RedditPostsRequest> remoteStore;
 
-    private Fetcher<List<RedditPostMetadata>, RedditPostsRequest> fetcher = new Fetcher<List<RedditPostMetadata>, RedditPostsRequest>() {
+    private Fetcher<List<RedditContent>, RedditPostsRequest> fetcher = new Fetcher<List<RedditContent>, RedditPostsRequest>() {
         @Nonnull
         @Override
-        public Observable<List<RedditPostMetadata>> fetch(@Nonnull RedditPostsRequest request) {
+        public Observable<List<RedditContent>> fetch(@Nonnull RedditPostsRequest request) {
             return getPosts(request.getKey(), request.getAfter());
         }
     };
 
-    private Observable<List<RedditPostMetadata>> getPosts(String subreddit, String after) {
+    private Observable<List<RedditContent>> getPosts(String subreddit, String after) {
         return redditApi.getSubreddit(subreddit, after)
-                .map(RedditResponse::getData)
+                .flatMap(new RedditDataParser())
                 .subscribeOn(Schedulers.io())
-                .flatMap(redditData -> {
-                    ListsPostStoreList.this.after = redditData.getAfter();
-                    return Observable.from(redditData.getPosts());
-                })
-                .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
+                .filter(redditContent -> !redditContent.getRedditContentData().isNsfw())
                 .map(redditPostMetadata -> {
                     int r = random.nextInt(10);
                     if (r % 5 == 0) {
@@ -62,14 +57,14 @@ public class ListsPostStoreList implements ListPostsStoreDataSource {
     }
 
     @Override
-    public Observable<List<RedditPostMetadata>> getPosts(String subreddit) {
-        RedditPostsRequest redditPostsRequest = new RedditPostsRequest(subreddit, RedditPostMetadata.class.getSimpleName(), null);
+    public Observable<List<RedditContent>> getPosts(String subreddit) {
+        RedditPostsRequest redditPostsRequest = new RedditPostsRequest(subreddit, RedditContent.class.getSimpleName(), null);
         return remoteStore.get(redditPostsRequest);
     }
 
     @Override
-    public Observable<List<RedditPostMetadata>> getPaginatedPosts(String subreddit) {
-        RedditPostsRequest redditPostsRequest = new RedditPostsRequest(subreddit, RedditPostMetadata.class.getSimpleName(), after);
+    public Observable<List<RedditContent>> getPaginatedPosts(String subreddit) {
+        RedditPostsRequest redditPostsRequest = new RedditPostsRequest(subreddit, RedditContent.class.getSimpleName(), after);
         return remoteStore.get(redditPostsRequest);
     }
 

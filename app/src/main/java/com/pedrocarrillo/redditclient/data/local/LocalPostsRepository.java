@@ -8,13 +8,10 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.pedrocarrillo.redditclient.data.PostsDataSource;
-import com.pedrocarrillo.redditclient.domain.RedditData;
-import com.pedrocarrillo.redditclient.domain.RedditPost;
-import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
+import com.pedrocarrillo.redditclient.domain.RedditContentData;
+import com.pedrocarrillo.redditclient.domain.RedditContent;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
-
-import java.util.List;
 
 import rx.Observable;
 import rx.Scheduler;
@@ -31,7 +28,7 @@ public class LocalPostsRepository implements PostsDataSource {
 
     private static LocalPostsRepository ourInstance;
 
-    private Func1<Cursor, RedditPostMetadata> mTaskMapperFunction;
+    private Func1<Cursor, RedditContent> mTaskMapperFunction;
 
     private String[] projection = {
             PostsPersistenceContract.PostEntry.COLUMN_NAME_ENTRY_ID,
@@ -60,7 +57,7 @@ public class LocalPostsRepository implements PostsDataSource {
         mTaskMapperFunction = this::getPost;
     }
 
-    private RedditPostMetadata getPost(@NonNull Cursor c){
+    private RedditContent getPost(@NonNull Cursor c){
         String id = c.getString(c.getColumnIndexOrThrow(PostsPersistenceContract.PostEntry.COLUMN_NAME_ENTRY_ID));
         String author = c.getString(c.getColumnIndexOrThrow(PostsPersistenceContract.PostEntry.COLUMN_NAME_AUTHOR));
         String subreddit = c.getString(c.getColumnIndexOrThrow(PostsPersistenceContract.PostEntry.COLUMN_NAME_SUBREDDIT));
@@ -69,14 +66,14 @@ public class LocalPostsRepository implements PostsDataSource {
         boolean isNsfw = c.getInt(c.getColumnIndexOrThrow(PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_NSFW)) == 1;
         boolean favorite = c.getInt(c.getColumnIndexOrThrow(PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_FAVORITE)) == 1;
         long createdAt = c.getLong(c.getColumnIndexOrThrow(PostsPersistenceContract.PostEntry.COLUMN_NAME_CREATED_AT));
-        RedditPost redditPost = new RedditPost(id, title, subreddit, isNsfw, createdAt, thumbnail, author);
-        RedditPostMetadata redditPostMetadata = new RedditPostMetadata(redditPost);
-        redditPostMetadata.setFavorite(favorite);
-        return redditPostMetadata;
+        RedditContentData redditContentData = new RedditContentData(id, title, subreddit, isNsfw, createdAt, thumbnail, author);
+        RedditContent redditContent = new RedditContent(redditContentData);
+        redditContent.setFavorite(favorite);
+        return redditContent;
     }
 
     @Override
-    public Observable<RedditPostMetadata> getPosts() {
+    public Observable<RedditContent> getPosts() {
         String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?", TextUtils.join(",", projection), PostsPersistenceContract.PostEntry.TABLE_NAME, PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_FAVORITE);
         return mDatabaseHelper.createQuery(PostsPersistenceContract.PostEntry.TABLE_NAME, sql, "1")
                 .mapToList(mTaskMapperFunction)
@@ -86,29 +83,29 @@ public class LocalPostsRepository implements PostsDataSource {
     }
 
     @Override
-    public Observable<RedditPostMetadata> getPaginatedPosts() {
+    public Observable<RedditContent> getPaginatedPosts() {
         return Observable.empty();
     }
 
     @Override
-    public void setFavorite(RedditPostMetadata redditPostMetadata, boolean favorite) {
+    public void setFavorite(RedditContent redditContent, boolean favorite) {
         if (favorite) {
             ContentValues values = new ContentValues();
-            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_ENTRY_ID, redditPostMetadata.getPostData().getId());
-            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_AUTHOR, redditPostMetadata.getPostData().getAuthor());
-            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_CREATED_AT, redditPostMetadata.getPostData().getCreatedAt());
-            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_NSFW, redditPostMetadata.getPostData().isNsfw());
-            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_SUBREDDIT, redditPostMetadata.getPostData().getSubredditNamePrefixed());
-            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_THUMBNAIL, redditPostMetadata.getPostData().getThumbnail());
-            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_TITLE, redditPostMetadata.getPostData().getTitle());
-            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_FAVORITE, redditPostMetadata.isFavorite() ? 1 : 0);
+            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_ENTRY_ID, redditContent.getRedditContentData().getId());
+            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_AUTHOR, redditContent.getRedditContentData().getAuthor());
+            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_CREATED_AT, redditContent.getRedditContentData().getCreatedAt());
+            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_NSFW, redditContent.getRedditContentData().isNsfw());
+            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_SUBREDDIT, redditContent.getRedditContentData().getSubredditNamePrefixed());
+            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_THUMBNAIL, redditContent.getRedditContentData().getThumbnail());
+            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_TITLE, redditContent.getRedditContentData().getTitle());
+            values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_FAVORITE, redditContent.isFavorite() ? 1 : 0);
             mDatabaseHelper.insert(PostsPersistenceContract.PostEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_IGNORE);
         } else {
             ContentValues values = new ContentValues();
             values.put(PostsPersistenceContract.PostEntry.COLUMN_NAME_IS_FAVORITE, 0);
 
             String selection = PostsPersistenceContract.PostEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {redditPostMetadata.getPostData().getId()};
+            String[] selectionArgs = {redditContent.getRedditContentData().getId()};
             mDatabaseHelper.update(PostsPersistenceContract.PostEntry.TABLE_NAME, values, selection, selectionArgs);
         }
     }

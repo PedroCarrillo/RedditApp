@@ -1,6 +1,9 @@
 package com.pedrocarrillo.redditclient.data.store.post;
 
 import com.pedrocarrillo.redditclient.domain.RedditData;
+import com.pedrocarrillo.redditclient.domain.RedditResponse;
+
+import java.util.List;
 
 import rx.Observable;
 
@@ -10,6 +13,6 @@ import rx.Observable;
 
 public interface PostStoreDataSource {
 
-    Observable<RedditData> getPost(String permalink);
+    Observable<List<RedditResponse>> getPost(String permalink);
 
 }

@@ -1,6 +1,6 @@
 package com.pedrocarrillo.redditclient.data.store.list;
 
-import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
+import com.pedrocarrillo.redditclient.domain.RedditContent;
 
 import java.util.List;
 
@@ -12,8 +12,8 @@ import rx.Observable;
 
 public interface ListPostsStoreDataSource {
 
-    Observable<List<RedditPostMetadata>> getPosts(String subreddit);
+    Observable<List<RedditContent>> getPosts(String subreddit);
 
-    Observable<List<RedditPostMetadata>> getPaginatedPosts(String subreddit);
+    Observable<List<RedditContent>> getPaginatedPosts(String subreddit);
 
 }

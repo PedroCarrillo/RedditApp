@@ -1,18 +1,13 @@
 package com.pedrocarrillo.redditclient.data.remote;
 
 import com.pedrocarrillo.redditclient.data.PostsDataSource;
-import com.pedrocarrillo.redditclient.domain.RedditData;
-import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
+import com.pedrocarrillo.redditclient.domain.RedditContent;
 import com.pedrocarrillo.redditclient.domain.RedditResponse;
 import com.pedrocarrillo.redditclient.network.RedditApi;
-import com.pedrocarrillo.redditclient.network.RetrofitManager;
-import com.pedrocarrillo.redditclient.ui.home.HomePresenter;
 
-import java.util.List;
 import java.util.Random;
 
 import rx.Observable;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -39,30 +34,30 @@ public class RemotePostsRepository implements PostsDataSource {
     }
 
     @Override
-    public Observable<RedditPostMetadata> getPosts() {
+    public Observable<RedditContent> getPosts() {
         return getPosts(null);
     }
 
     @Override
-    public Observable<RedditPostMetadata> getPaginatedPosts() {
+    public Observable<RedditContent> getPaginatedPosts() {
         return getPosts(after);
     }
 
     @Override
-    public void setFavorite(RedditPostMetadata redditPostMetadata, boolean favorite) {
+    public void setFavorite(RedditContent redditContent, boolean favorite) {
         // Nothing to do as this is only local.
-        redditPostMetadata.setFavorite(favorite);
+        redditContent.setFavorite(favorite);
     }
 
-    private Observable<RedditPostMetadata> getPosts(String after) {
+    private Observable<RedditContent> getPosts(String after) {
         return redditApi.getSubreddit("popular", after)
                 .map(RedditResponse::getData)
                 .subscribeOn(Schedulers.io())
                 .flatMap(redditData -> {
                     RemotePostsRepository.this.after = redditData.getAfter();
-                    return Observable.from(redditData.getPosts());
+                    return Observable.from(redditData.getChildren());
                 })
-                .filter(redditPostMetadata -> !redditPostMetadata.getPostData().isNsfw())
+                .filter(redditPostMetadata -> !redditPostMetadata.getRedditContentData().isNsfw())
                 .map(redditPostMetadata -> {
                     int r = random.nextInt(10);
                     if (r % 5 == 0) {

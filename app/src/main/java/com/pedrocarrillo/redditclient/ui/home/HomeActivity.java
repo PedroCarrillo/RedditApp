@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 
 import com.pedrocarrillo.redditclient.R;
 import com.pedrocarrillo.redditclient.adapter.HomeAdapter;
@@ -41,6 +42,7 @@ public class HomeActivity extends BaseActivityWithPresenter<HomeContractor.Prese
         ListPostsStoreDataSource remoteStore = new ListsPostStoreList(RetrofitManager.getInstance().getRedditApi());
         ListPostsStoreDataSource postStoreManager = new ListPostsStoreManager(remoteStore);
         setPresenter(new HomePresenter(this, postStoreManager, isConnected));
+        setToolbar();
         presenter.start();
     }
 
@@ -85,7 +87,7 @@ public class HomeActivity extends BaseActivityWithPresenter<HomeContractor.Prese
     @Override
     public void showPost(String permalink) {
         Intent intent = new Intent(this, PostActivity.class);
-        intent.putExtra(PostActivity.POST_PERMALINK, permalink);
+        intent.putExtra(PostActivity.Companion.getPOST_PERMALINK(), permalink);
         startActivity(intent);
     }
 }

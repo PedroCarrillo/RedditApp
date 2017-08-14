@@ -3,8 +3,7 @@ package com.pedrocarrillo.redditclient.data.repositories;
 import android.support.annotation.NonNull;
 
 import com.pedrocarrillo.redditclient.data.PostsDataSource;
-import com.pedrocarrillo.redditclient.domain.RedditData;
-import com.pedrocarrillo.redditclient.domain.RedditPostMetadata;
+import com.pedrocarrillo.redditclient.domain.RedditContent;
 
 import rx.Observable;
 
@@ -34,7 +33,7 @@ public class PostsRepository implements PostsDataSource {
     }
 
     @Override
-    public Observable<RedditPostMetadata> getPaginatedPosts() {
+    public Observable<RedditContent> getPaginatedPosts() {
         if (internetAccess) {
             return mPostsRemoteDataSource.getPaginatedPosts();
         } else {
@@ -43,7 +42,7 @@ public class PostsRepository implements PostsDataSource {
     }
 
     @Override
-    public Observable<RedditPostMetadata> getPosts() {
+    public Observable<RedditContent> getPosts() {
         if (internetAccess) {
             return mPostsRemoteDataSource.getPosts();
         } else {
@@ -52,8 +51,8 @@ public class PostsRepository implements PostsDataSource {
     }
 
     @Override
-    public void setFavorite(RedditPostMetadata redditPostMetadata, boolean favorite) {
-        mPostsLocalDataSource.setFavorite(redditPostMetadata, favorite);
+    public void setFavorite(RedditContent redditContent, boolean favorite) {
+        mPostsLocalDataSource.setFavorite(redditContent, favorite);
     }
 
 }
