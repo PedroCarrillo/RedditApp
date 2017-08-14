@@ -8,6 +8,7 @@ import com.pedrocarrillo.redditclient.domain.Comment
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import rx.subscriptions.CompositeSubscription
 
 /**
  * @author pedrocarrillo.
@@ -16,16 +17,19 @@ import rx.schedulers.Schedulers
 class PostPresenter(internal var view: PostContractor.View,
                     internal var postStore: PostStore) : PostContractor.Presenter {
 
+    val compositeSubscription = CompositeSubscription()
+
     override fun start() {
 
     }
 
     override fun unsubscribe() {
-
+        compositeSubscription.clear()
     }
 
     override fun loadInfo(permalink: String) {
-        postStore.getPost(permalink)
+        compositeSubscription.add(
+                postStore.getPost(permalink)
                 .subscribeOn(Schedulers.io())
                 .flatMapIterable({ redditResponses -> redditResponses })
                 .flatMap(RedditDataParser())
@@ -44,6 +48,6 @@ class PostPresenter(internal var view: PostContractor.View,
                     override fun onNext(comment: Comment) {
                         view.showComment(comment)
                     }
-                })
+                }))
     }
 }
