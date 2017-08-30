@@ -1,7 +1,10 @@
 package com.pedrocarrillo.redditclient.ui.singlePost
 
+import android.graphics.Rect
 import android.os.Bundle
+import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.GridLayoutManager
+import android.view.View
 import com.pedrocarrillo.redditclient.R
 import com.pedrocarrillo.redditclient.adapter.ExpandableCommentGroup
 import com.pedrocarrillo.redditclient.data.store.post.PostStore
@@ -21,6 +24,9 @@ class PostActivity : BaseActivityWithPresenter<PostContractor.Presenter>(), Post
     private val groupAdapter = GroupAdapter<ViewHolder>()
     private lateinit var groupLayoutManager: GridLayoutManager
 
+    private val threshold = 60;
+    private var initialPosition = 0.0f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_single_post)
@@ -36,8 +42,46 @@ class PostActivity : BaseActivityWithPresenter<PostContractor.Presenter>(), Post
         rv_comments.apply {
             layoutManager = groupLayoutManager
             adapter = groupAdapter
+            isNestedScrollingEnabled = false
         }
+        setPostBarAnimation()
+    }
 
+    private fun setPostBarAnimation() {
+        val scrollBounds = Rect()
+        content_scroll_view.getHitRect(scrollBounds)
+        realView.viewTreeObserver.addOnGlobalLayoutListener {
+            if (initialPosition == 0f) {
+                initialPosition = realView.y
+                updateInitialPosition()
+                content_scroll_view.setOnScrollChangeListener { v: NestedScrollView?,
+                                                                scrollX: Int,
+                                                                scrollY: Int,
+                                                                oldScrollX: Int,
+                                                                oldScrollY: Int ->
+                    val location = intArrayOf(0, 0)
+                    placeholder.getLocationOnScreen(location)
+                    if (placeholder.getLocalVisibleRect(scrollBounds)) {
+                        if (realView.visibility == View.GONE) {
+                            realView.visibility = View.VISIBLE
+                        }
+                        realView.y = location.get(1).toFloat() - threshold
+                        if (location.get(1) < placeholder.height + threshold) {
+                            realView.y = initialPosition
+                            realView.visibility = View.VISIBLE
+                        }
+                    } else {
+                        realView.y = initialPosition
+                        realView.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateInitialPosition() {
+        realView.y = placeholder.y
+        realView.requestLayout()
     }
 
     private fun populateAdapter() {

@@ -11,7 +11,7 @@ import rx.functions.Func1
  */
 class RedditDataParser : Func1<RedditResponse, Observable<RedditContent>> {
 
-    public var after: String? = null
+    var after: String? = null
 
     override fun call(redditResponse : RedditResponse?) : Observable<RedditContent> {
         return Observable

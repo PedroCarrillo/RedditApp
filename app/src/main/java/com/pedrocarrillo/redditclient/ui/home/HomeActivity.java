@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.ViewTreeObserver;
 
 import com.pedrocarrillo.redditclient.R;
 import com.pedrocarrillo.redditclient.adapter.HomeAdapter;
@@ -51,6 +53,17 @@ public class HomeActivity extends BaseActivityWithPresenter<HomeContractor.Prese
         homeAdapter = new HomeAdapter(displayableItems, this);
         rvMain.addItemDecoration(new HorizontalDividerDecoration(this));
         rvMain.setAdapter(homeAdapter);
+
+        rvMain.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                NestedScrollView.OnScrollChangeListener a = new NestedScrollView.OnScrollChangeListener() {
+                    @Override
+                    public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                    }
+                };
+            }
+        });
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvMain.setLayoutManager(linearLayoutManager);
     }
